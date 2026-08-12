@@ -1,0 +1,29 @@
+package com.devops.calculator;
+
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/calc")
+public class CalculatorController {
+
+    @GetMapping("/add")
+    public double add(@RequestParam("a") double a, @RequestParam("b") double b) { 
+        return a + b; 
+    }
+
+    @GetMapping("/sub")
+    public double sub(@RequestParam("a") double a, @RequestParam("b") double b) { 
+        return a - b; 
+    }
+
+    @GetMapping("/mul")
+    public double mul(@RequestParam("a") double a, @RequestParam("b") double b) { 
+        return a * b; 
+    }
+
+    @GetMapping("/div")
+    public double div(@RequestParam("a") double a, @RequestParam("b") double b) {
+        if (b == 0) throw new IllegalArgumentException("Division by zero is not allowed.");
+        return a / b;
+    }
+}

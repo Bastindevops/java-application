@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colorful Calculator</title>
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .calculator {
+            background: rgba(30, 30, 46, 0.95);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 340px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .header {
+            font-size: 14px;
+            font-weight: 600;
+            color: #a0aec0;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .display {
+            background: #1a1a2e;
+            text-align: right;
+            font-size: 44px;
+            font-weight: 300;
+            color: #ffffff;
+            padding: 15px 12px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        button {
+            background-color: #2d3748;
+            border: none;
+            padding: 16px 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        button:hover {
+            filter: brightness(1.2);
+            transform: translateY(-1px);
+        }
+        button:active {
+            transform: translateY(1px);
+        }
+        .btn-clear {
+            background-color: #fc8181;
+            color: #fff;
+        }
+        .btn-op {
+            background-color: #4a5568;
+            color: #63b3ed;
+        }
+        .btn-equals {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            grid-column: span 2;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <div class="header">
+            <span>✨ Colorful Calc</span>
+            <span style="color: #f6ad55;">● ● ●</span>
+        </div>
+        
+        <div class="display" id="display">0</div>
+
+        <div class="grid">
+            <button class="btn-clear" onclick="clearAll()">C</button>
+            <button class="btn-op" onclick="appendValue('(')">(</button>
+            <button class="btn-op" onclick="appendValue(')')">)</button>
+            <button class="btn-op" onclick="setOperator('div')">÷</button>
+
+            <button onclick="appendValue('7')">7</button>
+            <button onclick="appendValue('8')">8</button>
+            <button onclick="appendValue('9')">9</button>
+            <button class="btn-op" onclick="setOperator('mul')">×</button>
+
+            <button onclick="appendValue('4')">4</button>
+            <button onclick="appendValue('5')">5</button>
+            <button onclick="appendValue('6')">6</button>
+            <button class="btn-op" onclick="setOperator('sub')">-</button>
+
+            <button onclick="appendValue('1')">1</button>
+            <button onclick="appendValue('2')">2</button>
+            <button onclick="appendValue('3')">3</button>
+            <button class="btn-op" onclick="setOperator('add')">+</button>
+
+            <button onclick="appendValue('0')">0</button>
+            <button onclick="appendValue('.')">.</button>
+            <button class="btn-equals" onclick="calculate()">=</button>
+        </div>
+    </div>
+
+    <script>
+        let currentInput = "0";
+        let firstOperand = null;
+        let pendingOperator = null;
+        let resetScreen = false;
+
+        function updateDisplay() {
+            document.getElementById('display').innerText = currentInput;
+        }
+
+        function appendValue(val) {
+            if (currentInput === "0" || resetScreen) {
+                currentInput = val;
+                resetScreen = false;
+            } else {
+                currentInput += val;
+            }
+            updateDisplay();
+        }
+
+        function clearAll() {
+            currentInput = "0";
+            firstOperand = null;
+            pendingOperator = null;
+            updateDisplay();
+        }
+
+        function setOperator(op) {
+            firstOperand = parseFloat(currentInput);
+            pendingOperator = op;
+            resetScreen = true;
+        }
+
+        async function calculate() {
+            if (pendingOperator === null || firstOperand === null) return;
+            let secondOperand = parseFloat(currentInput);
+
+            try {
+                const response = await fetch(`/api/calc/${pendingOperator}?a=${firstOperand}&b=${secondOperand}`);
+                if (!response.ok) throw new Error("Calculation error");
+                let result = await response.text();
+                
+                if (result.endsWith(".0")) {
+                    result = result.substring(0, result.length - 2);
+                }
+                
+                currentInput = result;
+                updateDisplay();
+            } catch (error) {
+                currentInput = "Error";
+                updateDisplay();
+            }
+
+            pendingOperator = null;
+            firstOperand = null;
+            resetScreen = true;
+        }
+    </script>
+
+</body>
+</html>
+
