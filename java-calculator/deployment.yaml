@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calculator-deployment
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: java-calculator
+  template:
+    metadata:
+      labels:
+        app: java-calculator
+    spec:
+      containers:
+      - name: calculator
+        image: your-username/java-calculator:v1  # Replace with your Docker Hub username
+        ports:
+        - containerPort: 9200
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
