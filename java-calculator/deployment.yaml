@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: calculator
-        image: your-username/java-calculator:v1  # Replace with your Docker Hub username
+        image: devops93/java-calculator:v1  # Replace with your Docker Hub username
         ports:
         - containerPort: 9200
         imagePullPolicy: Always
